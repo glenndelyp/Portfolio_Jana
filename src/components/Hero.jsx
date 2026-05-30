@@ -9,11 +9,31 @@ export default function Hero() {
       className="relative overflow-hidden"
       style={{ background: "#3a4a2e", minHeight: "100vh", display: "flex", flexDirection: "column" }}
     >
+      <style>{`
+        @media (max-width: 767px) {
+          .hero-photo-div {
+            bottom: 1rem !important;
+            width: clamp(140px, 48vw, 260px) !important;
+            left: 50% !important;
+            transform: translateX(-50%);
+            top: clamp(4rem, 18vw, 7rem) !important;
+          }
+          .hero-orange-frame {
+            bottom: 1rem !important;
+            width: clamp(140px, 48vw, 260px) !important;
+            left: 50% !important;
+            transform: translateX(-50%);
+            top: clamp(4rem, 18vw, 7rem) !important;
+          }
+        }
+      `}</style>
+
       {/* ========== MAIN AREA ========== */}
       <div style={{ position: "relative", flex: 1, display: "flex", flexDirection: "column" }}>
 
-        {/* --- Orange square — offset behind photo as editorial frame --- */}
+        {/* --- Orange frame --- */}
         <div
+          className="hero-orange-frame"
           style={{
             position: "absolute",
             top: "clamp(5rem, 14vw, 12rem)",
@@ -28,17 +48,14 @@ export default function Hero() {
 
         {/* --- Gold stars --- */}
         <span style={{
-          position: "absolute",
-          top: "18%", left: "3%",
+          position: "absolute", top: "18%", left: "3%",
           fontSize: "2rem", color: "#f5c842",
           zIndex: 3, animation: "pulse 2s infinite"
         }}>✦</span>
         <span style={{
-          position: "absolute",
-          top: "34%", left: "5%",
+          position: "absolute", top: "34%", left: "5%",
           fontSize: "1.2rem", color: "#f5c842",
-          zIndex: 3, animation: "pulse 2s infinite",
-          animationDelay: "0.7s"
+          zIndex: 3, animation: "pulse 2s infinite", animationDelay: "0.7s"
         }}>✦</span>
 
         {/* --- PORTFOLIO headline --- */}
@@ -47,10 +64,9 @@ export default function Hero() {
           style={{
             position: "absolute",
             top: "clamp(1.5rem, 5vw, 8rem)",
-            left: 0,
-            right: 0,
+            left: 0, right: 0,
             textAlign: "center",
-            fontSize: "clamp(4rem, 12vw, 10rem)",
+            fontSize: "clamp(2.8rem, 12vw, 10rem)",
             color: "var(--cream, #f0ece0)",
             letterSpacing: "0.01em",
             lineHeight: 1,
@@ -61,8 +77,9 @@ export default function Hero() {
           PORTFOLIO
         </div>
 
-        {/* --- Profile photo — sits inside orange frame --- */}
+        {/* --- Profile photo --- */}
         <div
+          className="hero-photo-div"
           style={{
             position: "absolute",
             top: "clamp(5rem, 14vw, 12rem)",
@@ -89,30 +106,27 @@ export default function Hero() {
           />
         </div>
 
-{/* --- Ghost outline text behind orange --- */}
-<div
-  className="font-display font-black select-none pointer-events-none"
-  style={{
-    position: "absolute",
-    top: "clamp(1.5rem, 5vw, 8rem)",   // ← same top as the main headline
-    left: 0,
-    right: 0,
-    textAlign: "center",
-    fontSize: "clamp(4rem, 12vw, 10rem)",
-    lineHeight: 1,                      // ← match main headline lineHeight
-    letterSpacing: "0.01em",            // ← match main headline letterSpacing
-    color: "transparent",
-    WebkitTextStroke: "1.5px rgba(240,200,80,0.45)",
-    zIndex: 2,
-    // ← removed transform: "translateX(-10%)"
-  }}
->
-  <div>PORTFOLIO</div>
-  <div>PORTFOLIO</div>
-  <div>PORTFOLIO</div>
-</div>
+        {/* --- Ghost outline text --- */}
+        <div
+          className="font-display font-black select-none pointer-events-none"
+          style={{
+            position: "absolute",
+            top: "clamp(1.5rem, 5vw, 8rem)",
+            left: 0, right: 0,
+            textAlign: "center",
+            fontSize: "clamp(2.8rem, 12vw, 10rem)",
+            lineHeight: 1,
+            letterSpacing: "0.01em",
+            color: "transparent",
+            WebkitTextStroke: "1.5px rgba(240,200,80,0.45)",
+            zIndex: 2,
+          }}
+        >
+          <div>PORTFOLIO</div>
+          <div>PORTFOLIO</div>
+          <div>PORTFOLIO</div>
+        </div>
 
-      
         {/* Spacer */}
         <div style={{ minHeight: "calc(100vh - 120px)" }} />
       </div>
@@ -127,50 +141,40 @@ export default function Hero() {
           padding: "1.5rem 5%",
           zIndex: 10,
           position: "relative",
+          flexWrap: "wrap",
+          gap: "0.5rem",
         }}
       >
-        {/* Tagline left */}
-        <p
-          style={{
-            fontSize: "0.7rem",
-            lineHeight: 1.6,
-            color: "rgba(240,236,224,0.65)",
-            fontStyle: "italic",
-            maxWidth: "260px",
-            margin: 0,
-          }}
-        >
+        <p style={{
+          fontSize: "0.7rem", lineHeight: 1.6,
+          color: "rgba(240,236,224,0.65)", fontStyle: "italic",
+          maxWidth: "260px", margin: 0, flex: "1 1 140px",
+        }}>
           {config.tagline}
         </p>
 
-        {/* Scroll down — center */}
-        
-         <a href="#about"
-          style={{ textDecoration: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.4rem" }}
-        >
-          <span
-            style={{
-              background: "#f5c842",
-              color: "#1a1a18",
-              borderRadius: "9999px",
-              padding: "0.6rem 1.8rem",
-              fontSize: "0.8rem",
-              fontWeight: 700,
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-            }}
-          >
+        <a href="#about" style={{
+          textDecoration: "none", display: "flex",
+          flexDirection: "column", alignItems: "center", gap: "0.4rem",
+          flex: "0 0 auto",
+        }}>
+          <span style={{
+            background: "#f5c842", color: "#1a1a18",
+            borderRadius: "9999px", padding: "0.6rem 1.8rem",
+            fontSize: "0.8rem", fontWeight: 700,
+            letterSpacing: "0.1em", textTransform: "uppercase",
+          }}>
             Scroll down
           </span>
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+            xmlns="http://www.w3.org/2000/svg"
             style={{ color: "#f5c842", opacity: 0.8 }}>
             <path d="M8 3v10M8 13l-4-4M8 13l4-4"
               stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </a>
 
-        {/* Star right */}
-        <span style={{ fontSize: "1.2rem", color: "#f5c842" }}>✦</span>
+        <span style={{ fontSize: "1.2rem", color: "#f5c842", flex: "0 0 auto" }}>✦</span>
       </div>
     </section>
   );

@@ -20,24 +20,101 @@ function useInView() {
 export default function About() {
   const { socials } = config;
   const [sectionRef, sectionInView] = useInView();
-  const [textRef, textInView] = useInView();
 
   const styles = `
-    @media (max-width: 768px) {
-      #about-grid {
-        grid-template-columns: 1fr !important;
-        gap: 2rem !important;
-      }
-      #about-section {
-        padding: 3rem 4% 4rem !important;
-      }
-    }
     @keyframes float {
       0%, 100% { transform: translateY(0px); }
       50% { transform: translateY(-8px); }
     }
     .about-pill {
       animation: float 3s ease-in-out infinite;
+    }
+
+    /* ── MOBILE ─────────────────────────────────────── */
+    #about-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 3rem;
+    }
+
+    #about-section {
+      padding: 3rem 5% 4rem;
+    }
+
+    /* photo card: full width, reasonable height */
+    .about-photo-col {
+      position: relative;
+      width: 100%;
+    }
+    .about-photo-card {
+      position: relative;
+      width: 70%;
+      margin: 0 auto;
+    }
+
+    /* pills pushed inward on mobile so they don't escape the screen */
+    .about-pill-location {
+      position: absolute;
+      top: 10%;
+      left: -2%;
+      background: #f5c842;
+      color: #1a1a14;
+      border-radius: 9999px;
+      padding: 0.5rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      white-space: nowrap;
+      z-index: 5;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    }
+    .about-pill-role {
+      position: absolute;
+      bottom: 10%;
+      right: -2%;
+      background: #f5c842;
+      color: #1a1a14;
+      border-radius: 9999px;
+      padding: 0.5rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      white-space: nowrap;
+      z-index: 5;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      animation-delay: 1.5s;
+    }
+
+    /* ── DESKTOP (≥ 768px) ──────────────────────────── */
+    @media (min-width: 768px) {
+      #about-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: start;
+      }
+
+      #about-section {
+        padding: 5rem 6% 6rem;
+      }
+
+      .about-photo-card {
+        width: 90%;
+        margin-left: auto;
+        margin-right: 0;
+      }
+
+      .about-pill-location {
+        top: 22%;
+        left: 0;
+        font-size: 0.8rem;
+        padding: 0.55rem 1.3rem;
+      }
+
+      .about-pill-role {
+        bottom: 28%;
+        right: -5%;
+        font-size: 0.8rem;
+        padding: 0.55rem 1.3rem;
+      }
     }
   `;
 
@@ -49,7 +126,6 @@ export default function About() {
         style={{
           background: "#f0ece0",
           minHeight: "100vh",
-          padding: "5rem 6% 6rem",
           position: "relative",
           overflow: "hidden",
         }}
@@ -63,7 +139,7 @@ export default function About() {
           letterSpacing: "0.02em",
         }}>ABOUT</div>
 
-        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+        <div id="about-section" style={{ maxWidth: "1100px", margin: "0 auto" }}>
 
           {/* Section label */}
           <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "3rem" }}>
@@ -78,16 +154,9 @@ export default function About() {
           <div
             id="about-grid"
             ref={sectionRef}
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "4rem",
-              alignItems: "start",
-            }}
           >
             {/* LEFT — Intro text */}
             <div
-              ref={textRef}
               style={{
                 opacity: sectionInView ? 1 : 0,
                 transform: sectionInView ? "translateX(0)" : "translateX(-40px)",
@@ -96,7 +165,7 @@ export default function About() {
             >
               <h2 style={{
                 fontFamily: "'Georgia', serif",
-                fontSize: "clamp(2.8rem, 6vw, 4.5rem)",
+                fontSize: "clamp(2.2rem, 6vw, 4.5rem)",
                 fontWeight: 700, lineHeight: 1.05,
                 color: "#1a1a14", margin: "0 0 1.8rem",
               }}>
@@ -115,10 +184,8 @@ export default function About() {
               {/* Socials row */}
               <div style={{
                 display: "flex", alignItems: "center", gap: "12px",
-                marginBottom: "1.8rem",
+                marginBottom: "1.8rem", flexWrap: "wrap",
               }}>
-               
-
                 {socials?.linkedin && (
                   <a href={socials.linkedin} target="_blank" rel="noopener noreferrer" title="LinkedIn"
                     style={socialIconStyle}
@@ -130,7 +197,6 @@ export default function About() {
                     </svg>
                   </a>
                 )}
-
                 {socials?.github && (
                   <a href={socials.github} target="_blank" rel="noopener noreferrer" title="GitHub"
                     style={socialIconStyle}
@@ -142,7 +208,6 @@ export default function About() {
                     </svg>
                   </a>
                 )}
-
                 {socials?.instagram && (
                   <a href={socials.instagram} target="_blank" rel="noopener noreferrer" title="Instagram"
                     style={socialIconStyle}
@@ -156,7 +221,7 @@ export default function About() {
                 )}
               </div>
 
-              {/* ── Resume button — always visible ── */}
+              {/* Resume button */}
               <a
                 href={config.about?.resumeUrl || "#"}
                 target="_blank"
@@ -187,7 +252,6 @@ export default function About() {
                   e.currentTarget.style.color = "#f0ece0";
                 }}
               >
-                {/* Download icon */}
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v13M5 16l7 7 7-7M3 21h18" />
                 </svg>
@@ -196,18 +260,15 @@ export default function About() {
             </div>
 
             {/* RIGHT — Photo card + floating chips */}
-            <div style={{
-              position: "relative",
-              opacity: sectionInView ? 1 : 0,
-              transform: sectionInView ? "translateX(0)" : "translateX(40px)",
-              transition: "opacity 0.9s cubic-bezier(0.16,1,0.3,1) 0.15s, transform 0.9s cubic-bezier(0.16,1,0.3,1) 0.15s",
-            }}>
-
-              {/* Photo card */}
-              <div style={{
-                position: "relative", width: "75%",
-                marginLeft: "auto", zIndex: 2,
-              }}>
+            <div
+              className="about-photo-col"
+              style={{
+                opacity: sectionInView ? 1 : 0,
+                transform: sectionInView ? "translateX(0)" : "translateX(40px)",
+                transition: "opacity 0.9s cubic-bezier(0.16,1,0.3,1) 0.15s, transform 0.9s cubic-bezier(0.16,1,0.3,1) 0.15s",
+              }}
+            >
+              <div className="about-photo-card">
                 {/* Green backdrop */}
                 <div style={{
                   position: "absolute", top: "1.2rem", left: "-1.2rem",
@@ -236,25 +297,12 @@ export default function About() {
               </div>
 
               {/* Floating pill — location */}
-              <div className="about-pill" style={{
-                position: "absolute", top: "22%", left: 0,
-                background: "#f5c842", color: "#1a1a14",
-                borderRadius: "9999px", padding: "0.55rem 1.3rem",
-                fontSize: "0.8rem", fontWeight: 700, whiteSpace: "nowrap",
-                zIndex: 5, boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
-              }}>
+              <div className="about-pill about-pill-location">
                 {config.about?.location || "Philippines 🇵🇭"}
               </div>
 
               {/* Floating pill — role */}
-              <div className="about-pill" style={{
-                position: "absolute", bottom: "28%", right: "-5%",
-                background: "#f5c842", color: "#1a1a14",
-                borderRadius: "9999px", padding: "0.55rem 1.3rem",
-                fontSize: "0.8rem", fontWeight: 700, whiteSpace: "nowrap",
-                zIndex: 5, boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
-                animationDelay: "1.5s",
-              }}>
+              <div className="about-pill about-pill-role">
                 {config.about?.role || "Graphic Designer"}
               </div>
 
