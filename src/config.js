@@ -29,6 +29,11 @@ export const config = {
     { name: "JavaScript", category: "frontend" },
     { name: "Git & GitHub", category: "tool" },
     { name: "VS Code", category: "tool" },
+    { name: "React", category: "frontend" },
+    { name: "Tailwind CSS", category: "frontend" },
+    { name: "Android Studio", category: "tool" },
+    { name: "Node.js", category: "backend" },
+    { name: "Vite", category: "tool" },
   ],
   projects: [
     {
@@ -63,14 +68,12 @@ certifications: [
   {
     name: "Google UX Design Certificate",
     issuer: "Google / Coursera",
-    year: "2024",
     color: "#4285F4",
     image: "/cert-1.png",       
   },
   {
     name: "Responsive Web Design",
     issuer: "freeCodeCamp",
-    year: "2024",
     color: "#302267",
     image: "/jana-cert-1.png",  
   },
@@ -78,23 +81,20 @@ certifications: [
   {
     name: "MCITS",
     issuer: "HCDC",
-    year: "2024",
     color: "#302267",
     image: "/mcit.jpg",  
   },
   {
     name: "EDUCTOUR",
     issuer: "WATTS",
-    year: "2024",
     color: "#302267",
     image: "/watts.jpg",  
   },
   {
     name: "On-the-Job Training",
     issuer: "Eastern Mindanao Command",
-    year: "2026",
     color: "#302267",
-    image: "/ojt1.jpg",  
+    image: "/ojt-bro.jpg",  
   },
 
 

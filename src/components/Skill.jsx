@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { config } from "../config";
 import BlurText from "./reactbits/BlurText";
 import SpotlightCard from "./reactbits/SpotlightCard";
@@ -20,99 +20,187 @@ const skillIcons = {
 
 const categoryColor = {
   design:   "#c0392b",
-  frontend: "#f5c842",
+  frontend: "#b5657a",
   backend:  "#6abf69",
-  tool:     "#c47d2a",
+  tool:     "#a85568",
 };
 
-const categoryLabel = {
-  design:   "Design",
-  frontend: "Frontend",
-  backend:  "Backend",
-  tool:     "Tool",
-};
+const floatVariants = [
+  { duration: "3.2s", delay: "0s"   },
+  { duration: "3.8s", delay: "0.4s" },
+  { duration: "2.9s", delay: "0.8s" },
+  { duration: "3.5s", delay: "0.2s" },
+  { duration: "4.1s", delay: "0.6s" },
+  { duration: "3.3s", delay: "1.0s" },
+  { duration: "2.8s", delay: "0.3s" },
+  { duration: "3.7s", delay: "0.7s" },
+  { duration: "3.0s", delay: "0.5s" },
+  { duration: "3.6s", delay: "0.9s" },
+  { duration: "4.2s", delay: "0.1s" },
+  { duration: "3.1s", delay: "0.6s" },
+];
 
-function SkillCard({ skill }) {
-  const color = categoryColor[skill.category] || "#888";
+function useInView(threshold = 0.15) {
+  const ref = useRef(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([entry]) => {
+      setInView(entry.isIntersecting);
+    }, { threshold });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [threshold]);
+  return [ref, inView];
+}
+
+function SkillCard({ skill, index, sectionInView }) {
+  const [hovered, setHovered] = useState(false);
+  const color = categoryColor[skill.category] || "#C97A8A";
   const iconSrc = skillIcons[skill.name];
+  const floatV = floatVariants[index % floatVariants.length];
+  const staggerDelay = Math.min(index * 0.07, 1.1);
+  const animName = `floatCard${index}`;
 
   return (
-    <SpotlightCard
-      spotlightColor={`${color}40`}
-      className=""
-      style={{ height: "100%" }}
-    >
+    <>
+      <style>{`
+        @keyframes ${animName} {
+          0%, 100% { transform: translateY(0px); }
+          50%       { transform: translateY(-9px); }
+        }
+        .skill-card-${index} {
+          animation: ${sectionInView ? `${animName} ${floatV.duration} ease-in-out infinite ${floatV.delay}` : "none"};
+          transition: transform 0.38s cubic-bezier(0.34,1.56,0.64,1),
+                      box-shadow 0.38s ease,
+                      opacity 0.65s cubic-bezier(0.16,1,0.3,1) ${staggerDelay}s;
+        }
+        .skill-card-${index}:hover {
+          animation: none !important;
+          transform: scale(1.28) translateY(-8px) !important;
+          box-shadow: 0 40px 80px rgba(61,26,36,0.22), 0 0 0 2px ${color}55 !important;
+          z-index: 20 !important;
+        }
+      `}</style>
+
       <div
+        className={`skill-card-${index}`}
         style={{
-          padding: "1.6rem 1rem 1.2rem",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "0.75rem",
+          opacity: sectionInView ? 1 : 0,
+          transform: sectionInView ? "translateY(0) scale(1)" : "translateY(40px) scale(0.88)",
           position: "relative",
+          zIndex: hovered ? 20 : 1,
+          cursor: "default",
+          borderRadius: "1.25rem",
+          willChange: "transform",
         }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
       >
-        {/* Category dot top-right */}
-        <div style={{
-          position: "absolute", top: "0rem", right: "0.2rem",
-          width: 7, height: 7, borderRadius: "50%",
-          background: color, opacity: 0.8,
-        }} />
-
-        {/* Icon */}
-        <div style={{ height: "44px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          {iconSrc ? (
-            <img
-              src={iconSrc}
-              alt={skill.name}
-              width={40}
-              height={40}
-              style={{ objectFit: "contain" }}
-              onError={e => {
-                e.currentTarget.style.display = "none";
-                e.currentTarget.nextSibling.style.display = "flex";
-              }}
-            />
-          ) : null}
+        <SpotlightCard
+          spotlightColor={`${color}40`}
+          className=""
+          style={{
+            height: "100%",
+            borderRadius: "1.25rem",
+            boxShadow: hovered
+              ? `0 40px 80px rgba(61,26,36,0.22), 0 0 0 2px ${color}55`
+              : "0 4px 20px rgba(61,26,36,0.07)",
+            transition: "box-shadow 0.38s ease",
+            background: hovered ? "rgba(255,255,255,0.6)" : undefined,
+          }}
+        >
           <div style={{
-            display: iconSrc ? "none" : "flex",
-            width: 44, height: 44,
-            borderRadius: "0.6rem",
-            background: `${color}22`,
-            border: `1.5px solid ${color}55`,
-            alignItems: "center", justifyContent: "center",
-            fontSize: "1rem", fontWeight: 800, color: color,
-            fontFamily: "'Georgia', serif",
+            padding: "2.2rem 1.2rem 1.8rem",
+            display: "flex", flexDirection: "column",
+            alignItems: "center", gap: "1rem",
+            position: "relative",
           }}>
-            {skill.name.slice(0, 2).toUpperCase()}
-          </div>
-        </div>
+            {/* Top color bar */}
+            <div style={{
+              position: "absolute", top: 0, left: "20%", right: "20%",
+              height: "2.5px", borderRadius: "0 0 4px 4px",
+              background: `linear-gradient(90deg, transparent, ${color}, transparent)`,
+              opacity: hovered ? 1 : 0.35,
+              transition: "opacity 0.3s ease",
+            }} />
 
-        {/* Name */}
-        <span style={{
-          fontSize: "0.78rem",
-          fontWeight: 600,
-          color: "#f0ece0",
-          letterSpacing: "0.06em",
-          textTransform: "uppercase",
-          textAlign: "center",
-          lineHeight: 1.3,
-        }}>
-          {skill.name}
-        </span>
+            {/* Icon */}
+            <div style={{
+              width: "72px", height: "72px",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              background: hovered ? `${color}15` : "rgba(61,26,36,0.03)",
+              borderRadius: "1.1rem",
+              border: `1.5px solid ${hovered ? `${color}50` : "rgba(61,26,36,0.07)"}`,
+              transition: "all 0.3s ease",
+            }}>
+              {iconSrc ? (
+                <img
+                  src={iconSrc}
+                  alt={skill.name}
+                  width={42} height={42}
+                  style={{
+                    objectFit: "contain", display: "block",
+                    filter: hovered ? "drop-shadow(0 3px 8px rgba(0,0,0,0.18))" : "none",
+                    transition: "filter 0.3s ease",
+                  }}
+                  onError={e => {
+                    e.currentTarget.style.display = "none";
+                    e.currentTarget.nextSibling.style.display = "flex";
+                  }}
+                />
+              ) : null}
+              <div style={{
+                display: iconSrc ? "none" : "flex",
+                width: 42, height: 42,
+                alignItems: "center", justifyContent: "center",
+                fontSize: "1.1rem", fontWeight: 800, color,
+                fontFamily: "'Georgia', serif",
+              }}>
+                {skill.name.slice(0, 2).toUpperCase()}
+              </div>
+            </div>
+
+            {/* Name + category */}
+            <div style={{ textAlign: "center" }}>
+              <span style={{
+                fontSize: "0.82rem", fontWeight: 700,
+                color: hovered ? color : "#3D1A24",
+                letterSpacing: "0.07em", textTransform: "uppercase",
+                lineHeight: 1.3, display: "block",
+                transition: "color 0.25s ease",
+              }}>
+                {skill.name}
+              </span>
+              {skill.category && (
+                <span style={{
+                  fontSize: "0.62rem", fontWeight: 500,
+                  color: hovered ? `${color}90` : "rgba(61,26,36,0.28)",
+                  letterSpacing: "0.06em", textTransform: "capitalize",
+                  transition: "color 0.25s ease",
+                  marginTop: "0.2rem", display: "block",
+                }}>
+                  {skill.category}
+                </span>
+              )}
+            </div>
+          </div>
+        </SpotlightCard>
       </div>
-    </SpotlightCard>
+    </>
   );
 }
 
 export default function Skill() {
   const hasSkills = config.skills && config.skills.length > 0;
+  const [sectionRef, sectionInView] = useInView();
 
   return (
     <section
       id="skills"
       style={{
-        background: "#3a4a2e",
+        background: "#EDE0D0",
         padding: "5rem 6% 6rem",
         position: "relative",
         overflow: "hidden",
@@ -120,37 +208,30 @@ export default function Skill() {
     >
       {/* Ghost background text */}
       <div style={{
-        position: "absolute",
-        bottom: "-1rem", right: "-1rem",
-        fontSize: "clamp(5rem, 18vw, 14rem)",
-        fontWeight: 900,
-        color: "transparent",
-        WebkitTextStroke: "1.5px rgba(240,200,80,0.1)",
-        lineHeight: 1,
-        userSelect: "none", pointerEvents: "none",
-        letterSpacing: "0.02em",
-        fontFamily: "'Georgia', serif",
+        position: "absolute", bottom: "-1rem", right: "-1rem",
+        fontSize: "clamp(5rem, 18vw, 14rem)", fontWeight: 900,
+        color: "transparent", WebkitTextStroke: "1.5px rgba(61,26,36,0.07)",
+        lineHeight: 1, userSelect: "none", pointerEvents: "none",
+        letterSpacing: "0.02em", fontFamily: "'Georgia', serif",
       }}>SKILLS</div>
 
-      <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+      <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
 
         {/* Section label */}
         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "2.5rem" }}>
-          <span style={{ color: "#f5c842", fontSize: "1.2rem" }}>✦</span>
+          <span style={{ color: "#C97A8A", fontSize: "1.2rem" }}>✦</span>
           <span style={{
             fontSize: "0.75rem", letterSpacing: "0.2em",
-            textTransform: "uppercase", color: "rgba(240,236,224,0.5)", fontWeight: 600,
+            textTransform: "uppercase", color: "rgba(61,26,36,0.45)", fontWeight: 600,
           }}>02 — Skills & Tech Stack</span>
         </div>
 
-        {/* Animated heading with BlurText */}
+        {/* Heading */}
         <div style={{
           fontFamily: "'Georgia', serif",
           fontSize: "clamp(2.2rem, 5vw, 3.5rem)",
-          fontWeight: 700,
-          lineHeight: 1.05,
-          color: "#f0ece0",
-          marginBottom: "1.5rem",
+          fontWeight: 700, lineHeight: 1.05,
+          color: "#3D1A24", marginBottom: "3rem",
         }}>
           <BlurText
             text="What I work with"
@@ -161,38 +242,32 @@ export default function Skill() {
           />
         </div>
 
-        {/* Category legend */}
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "1.2rem", marginBottom: "3rem" }}>
-          {Object.entries(categoryLabel).map(([key, label]) => (
-            <span key={key} style={{
-              display: "flex", alignItems: "center", gap: "0.45rem",
-              fontSize: "0.72rem", letterSpacing: "0.1em",
-              color: "rgba(240,236,224,0.45)", textTransform: "uppercase",
-            }}>
-              <span style={{ width: 7, height: 7, borderRadius: "50%", background: categoryColor[key] }} />
-              {label}
-            </span>
-          ))}
-        </div>
-
+        {/* Grid */}
         {hasSkills ? (
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))",
-            gap: "1rem",
-          }}>
+          <div
+            ref={sectionRef}
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+              gap: "1.5rem",
+            }}
+          >
             {config.skills.map((skill, i) => (
-              <SkillCard key={i} skill={skill} />
+              <SkillCard
+                key={skill.name}
+                skill={skill}
+                index={i}
+                sectionInView={sectionInView}
+              />
             ))}
           </div>
         ) : (
           <div style={{
-            border: "1.5px dashed rgba(240,236,224,0.12)",
+            border: "1.5px dashed rgba(61,26,36,0.1)",
             borderRadius: "1rem", padding: "3.5rem 2rem",
-            textAlign: "center", color: "rgba(240,236,224,0.3)",
+            textAlign: "center", color: "rgba(61,26,36,0.3)",
           }} />
         )}
-
       </div>
     </section>
   );
